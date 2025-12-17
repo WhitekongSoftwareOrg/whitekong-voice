@@ -23,6 +23,8 @@
     <key>NSMicrophoneUsageDescription</key>
     <string>Dictado necesita acceso al micrófono para transcribir tu voz.</string>
     <key>NSAppleEventsUsageDescription</key>
-    <string>Dictado necesita permisos para escribir texto en otras aplicaciones.</string>
+    <string>WhiteKong Voice necesita permisos para escribir texto en otras aplicaciones.</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
 </dict>
 </plist>
