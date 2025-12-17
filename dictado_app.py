@@ -14,6 +14,7 @@ import sys
 import tempfile
 import time
 import threading
+import queue
 from pathlib import Path
 from typing import Optional
 from datetime import datetime
@@ -261,8 +262,29 @@ class WhiteKongVoiceApp(rumps.App):
         # Construir menú
         self.build_menu()
         
+        # Cola para actualizaciones de UI thread-safe
+        self.ui_queue = queue.Queue()
+        
+        # Timer para procesar la cola de UI (cada 0.1s)
+        self.ui_timer = rumps.Timer(self.process_ui_queue, 0.1)
+        self.ui_timer.start()
+        
         # Iniciar listener de teclado
         self.start_keyboard_listener()
+    
+    def process_ui_queue(self, _):
+        """Procesa las actualizaciones de UI en el hilo principal."""
+        try:
+            while not self.ui_queue.empty():
+                action, args = self.ui_queue.get_nowait()
+                
+                if action == 'title':
+                    self.title = args
+                elif action == 'notification':
+                    title, subtitle, message = args
+                    rumps.notification(title, subtitle, message)
+        except queue.Empty:
+            pass
     
     def build_menu(self):
         """Construye el menú de la aplicación."""
@@ -428,7 +450,7 @@ class WhiteKongVoiceApp(rumps.App):
         """Inicia la grabación."""
         log("🔴 Iniciando grabación...")
         self.recording = True
-        self.title = "🔴"  # Indicador de grabación
+        self.ui_queue.put(('title', "🔴"))  # Update UI thread-safe
         self.recorder = AudioRecorder()
         self.recorder.start_recording()
     
@@ -439,7 +461,7 @@ class WhiteKongVoiceApp(rumps.App):
         
         log("⏳ Deteniendo grabación, procesando...")
         self.recording = False
-        self.title = "⏳"  # Indicador de procesamiento
+        self.ui_queue.put(('title', "⏳"))  # Update UI thread-safe
         
         # Procesar en hilo separado para no bloquear la UI
         def process():
@@ -458,18 +480,18 @@ class WhiteKongVoiceApp(rumps.App):
                             escribir_texto(texto)
                         else:
                             log("❌ Error: No se pudo transcribir")
-                            rumps.notification(
+                            self.ui_queue.put(('notification', (
                                 "WhiteKong Voice",
                                 "Error",
                                 "No se pudo transcribir el audio"
-                            )
+                            )))
                     else:
                         log("⚠️ No se grabó audio")
             except Exception as e:
                 log(f"❌ Error procesando: {e}")
-                rumps.notification("WhiteKong Voice", "Error", str(e))
+                self.ui_queue.put(('notification', ("WhiteKong Voice", "Error", str(e))))
             finally:
-                self.title = "🎤"  # Restaurar icono
+                self.ui_queue.put(('title', "🎤"))  # Restaurar icono thread-safe
         
         threading.Thread(target=process, daemon=True).start()
     
