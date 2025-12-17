@@ -50,8 +50,6 @@ source venv/bin/activate
 python dictado_app.py
 ```
 
-O haz doble-click en `WhiteKong Voice.app`.
-
 ### 5. Configurar API Keys
 
 1. Click en el icono 🎤 en la barra de menú
@@ -137,10 +135,9 @@ Y habilita el terminal o la app.
 whitekong-voice/
 ├── dictado_app.py              # App de barra de menú (macOS)
 ├── dictado_app_windows.py      # App de bandeja del sistema (Windows)
-├── dictado_global.py           # Script de terminal (multiplataforma)
+├── dictado_global.py           # Script de terminal (alternativo)
 ├── requirements.txt            # Dependencias macOS
 ├── requirements-windows.txt    # Dependencias Windows
-├── WhiteKong Voice.app/        # App empaquetada para macOS
 └── README.md
 ```
 

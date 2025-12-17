@@ -1,5 +1,6 @@
 # Dependencias y entornos virtuales
 venv/
+venv_*/
 .venv/
 env/
 __pycache__/
@@ -26,6 +27,7 @@ Thumbs.db
 
 # Archivos de configuración local (contienen API keys)
 .dictado_config
+~/.whitekong_voice_config
 
 # Archivos temporales de audio
 dictado_*.wav
@@ -33,5 +35,10 @@ dictado_*.wav
 # Logs
 *.log
 
+# Apps y builds
+*.app/
+*.spec
+
 # Iconos generados
 icon.iconset/
+AppIcon.iconset/
