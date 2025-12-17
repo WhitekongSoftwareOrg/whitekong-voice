@@ -1,0 +1,37 @@
+# Dependencias y entornos virtuales
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Archivos de sistema
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Archivos de configuración local (contienen API keys)
+.dictado_config
+
+# Archivos temporales de audio
+dictado_*.wav
+
+# Logs
+*.log
+
+# Iconos generados
+icon.iconset/

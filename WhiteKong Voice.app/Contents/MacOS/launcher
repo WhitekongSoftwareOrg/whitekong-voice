@@ -1,0 +1,11 @@
+#!/bin/bash
+# Dictado App Launcher
+
+# Obtener el directorio de la app
+APP_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
+SCRIPT_DIR="/Users/smanez/codeWk/wisWK"
+
+# Activar venv y ejecutar
+cd "$SCRIPT_DIR"
+source venv/bin/activate
+exec python dictado_app.py

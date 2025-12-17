@@ -1,0 +1,17 @@
+# WhiteKong Voice - Dependencias
+# Instalar con: pip install -r requirements.txt
+
+# Captura de teclado y escritura
+pynput>=1.7.6
+
+# Grabación de audio
+sounddevice>=0.4.6
+scipy>=1.11.0
+numpy>=1.24.0
+
+# App de barra de menú para macOS
+rumps>=0.4.0
+
+# Proveedores de IA
+groq>=0.4.0
+google-generativeai>=0.4.0
