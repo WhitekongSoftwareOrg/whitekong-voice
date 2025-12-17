@@ -1,0 +1,21 @@
+# WhiteKong Voice - Dependencias para Windows
+# Instalar con: pip install -r requirements-windows.txt
+
+# Captura de teclado y escritura
+pynput>=1.7.6
+
+# Grabación de audio
+sounddevice>=0.4.6
+scipy>=1.11.0
+numpy>=1.24.0
+
+# Bandeja del sistema para Windows
+pystray>=0.19.0
+Pillow>=10.0.0
+
+# Notificaciones de Windows (opcional)
+win10toast>=0.9
+
+# Proveedores de IA
+groq>=0.4.0
+google-generativeai>=0.4.0

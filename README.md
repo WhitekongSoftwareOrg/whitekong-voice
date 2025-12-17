@@ -1,8 +1,9 @@
 # 🎤 WhiteKong Voice
 
-Aplicación de dictado por voz para macOS, similar a Wispr Flow. Transcribe tu voz a texto usando IA (Groq/Whisper o Google Gemini) y lo escribe automáticamente donde esté tu cursor.
+Aplicación de dictado por voz para macOS y Windows, similar a Wispr Flow. Transcribe tu voz a texto usando IA (Groq/Whisper o Google Gemini) y lo escribe automáticamente donde esté tu cursor.
 
 ![macOS](https://img.shields.io/badge/macOS-10.15+-blue)
+![Windows](https://img.shields.io/badge/Windows-10+-blue)
 ![Python](https://img.shields.io/badge/Python-3.10+-green)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
@@ -57,6 +58,49 @@ O haz doble-click en `WhiteKong Voice.app`.
 2. Selecciona **⚙️ Configurar API Keys**
 3. Introduce tu(s) API Key(s)
 
+---
+
+## 🪟 Instalación en Windows
+
+### 1. Clonar el repositorio
+
+```powershell
+git clone https://github.com/WhitekongSoftwareOrg/whitekong-voice.git
+cd whitekong-voice
+```
+
+### 2. Crear entorno virtual e instalar dependencias
+
+```powershell
+python -m venv venv
+.\venv\Scripts\activate
+pip install -r requirements-windows.txt
+```
+
+### 3. Lanzar la app
+
+```powershell
+.\venv\Scripts\activate
+python dictado_app_windows.py
+```
+
+### 4. Configurar API Keys
+
+1. Click derecho en el icono 🎤 en la bandeja del sistema
+2. Selecciona **⚙️ Configurar API Keys**
+3. Introduce tu(s) API Key(s)
+
+### Controles en Windows
+
+| Acción | Cómo |
+|--------|------|
+| **Grabar** | Mantén `Ctrl + Alt` |
+| **Transcribir** | Suelta las teclas |
+| **Cambiar proveedor** | Click derecho en icono → Proveedor |
+| **Salir** | Click derecho → ❌ Salir |
+
+---
+
 ## 📖 Uso
 
 ### Controles
@@ -91,11 +135,12 @@ Y habilita el terminal o la app.
 
 ```
 whitekong-voice/
-├── dictado_app.py          # App de barra de menú (principal)
-├── dictado_global.py       # Script de terminal alternativo
-├── requirements.txt        # Dependencias Python
-├── WhiteKong Voice.app/    # App empaquetada para macOS
-├── Dictado.command         # Lanzador alternativo
+├── dictado_app.py              # App de barra de menú (macOS)
+├── dictado_app_windows.py      # App de bandeja del sistema (Windows)
+├── dictado_global.py           # Script de terminal (multiplataforma)
+├── requirements.txt            # Dependencias macOS
+├── requirements-windows.txt    # Dependencias Windows
+├── WhiteKong Voice.app/        # App empaquetada para macOS
 └── README.md
 ```
 
