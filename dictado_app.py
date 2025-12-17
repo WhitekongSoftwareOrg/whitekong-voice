@@ -16,6 +16,8 @@ import time
 import threading
 from pathlib import Path
 from typing import Optional
+from datetime import datetime
+from collections import deque
 
 import rumps
 
@@ -33,6 +35,17 @@ DEFAULT_GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 SAMPLE_RATE = 16000
 CHANNELS = 1
 DTYPE = "int16"
+
+# Logs
+LOG_MAX_ENTRIES = 100
+log_buffer = deque(maxlen=LOG_MAX_ENTRIES)
+
+def log(message: str):
+    """Añade un mensaje al buffer de logs."""
+    timestamp = datetime.now().strftime("%H:%M:%S")
+    entry = f"[{timestamp}] {message}"
+    log_buffer.append(entry)
+    print(entry)  # También imprimir en consola
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -274,6 +287,9 @@ class WhiteKongVoiceApp(rumps.App):
         self.config_menu.add(rumps.MenuItem("Configurar Groq API Key...", callback=self.config_groq_key))
         self.config_menu.add(rumps.MenuItem("Configurar Google API Key...", callback=self.config_google_key))
         
+        # Botón ver logs
+        logs_button = rumps.MenuItem("📋 Ver logs", callback=self.show_logs)
+        
         # Botón de salir
         quit_button = rumps.MenuItem("❌ Salir", callback=self.quit_app)
         
@@ -286,6 +302,7 @@ class WhiteKongVoiceApp(rumps.App):
             self.provider_google,
             None,  # Separador
             self.config_menu,
+            logs_button,
             None,  # Separador
             quit_button
         ]
@@ -353,6 +370,24 @@ class WhiteKongVoiceApp(rumps.App):
             self.config.save()
             rumps.notification("WhiteKong Voice", "API Key guardada", "Google API Key actualizada ✅")
     
+    def show_logs(self, sender):
+        """Muestra los logs en un archivo de texto."""
+        import subprocess
+        
+        log_file = "/tmp/whitekong_voice_logs.txt"
+        
+        if not log_buffer:
+            logs_text = "No hay logs disponibles."
+        else:
+            logs_text = "📋 LOGS DE WHITEKONG VOICE\n"
+            logs_text += "=" * 50 + "\n\n"
+            logs_text += "\n".join(log_buffer)
+        
+        with open(log_file, 'w') as f:
+            f.write(logs_text)
+        
+        subprocess.run(["open", log_file])
+    
     def start_keyboard_listener(self):
         """Inicia el listener de teclado en un hilo separado."""
         from pynput import keyboard
@@ -391,6 +426,7 @@ class WhiteKongVoiceApp(rumps.App):
     
     def start_recording(self):
         """Inicia la grabación."""
+        log("🔴 Iniciando grabación...")
         self.recording = True
         self.title = "🔴"  # Indicador de grabación
         self.recorder = AudioRecorder()
@@ -401,6 +437,7 @@ class WhiteKongVoiceApp(rumps.App):
         if not self.recording:
             return
         
+        log("⏳ Deteniendo grabación, procesando...")
         self.recording = False
         self.title = "⏳"  # Indicador de procesamiento
         
@@ -412,18 +449,24 @@ class WhiteKongVoiceApp(rumps.App):
                     self.recorder = None
                     
                     if ruta_audio:
+                        log(f"📁 Audio guardado: {ruta_audio}")
+                        log(f"🤖 Transcribiendo con {self.config.provider}...")
                         texto = transcribir_audio(ruta_audio, self.config)
                         
                         if texto:
+                            log(f"✅ Transcrito: {texto[:50]}...")
                             escribir_texto(texto)
                         else:
+                            log("❌ Error: No se pudo transcribir")
                             rumps.notification(
                                 "WhiteKong Voice",
                                 "Error",
                                 "No se pudo transcribir el audio"
                             )
+                    else:
+                        log("⚠️ No se grabó audio")
             except Exception as e:
-                print(f"Error procesando: {e}")
+                log(f"❌ Error procesando: {e}")
                 rumps.notification("WhiteKong Voice", "Error", str(e))
             finally:
                 self.title = "🎤"  # Restaurar icono
