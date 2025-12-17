@@ -443,21 +443,18 @@ class WhiteKongVoiceApp(rumps.App):
 
 def hide_dock_icon():
     """Oculta el icono del Dock en macOS (app se comporta como 'agent')."""
-    # Deshabilitado temporalmente - puede causar crashes en algunas versiones
-    # try:
-    #     from AppKit import NSApplication, NSApplicationActivationPolicyAccessory
-    #     app = NSApplication.sharedApplication()
-    #     app.setActivationPolicy_(NSApplicationActivationPolicyAccessory)
-    # except ImportError:
-    #     pass
-    # except Exception as e:
-    #     print(f"Nota: No se pudo ocultar icono del Dock: {e}")
-    pass
+    try:
+        import objc
+        from Foundation import NSBundle
+        info = NSBundle.mainBundle().infoDictionary()
+        info["LSBackgroundOnly"] = "1"
+    except Exception:
+        pass  # Silenciosamente ignorar si falla
 
 
 if __name__ == "__main__":
-    # Ocultar icono del Dock (deshabilitado por ahora)
-    # hide_dock_icon()
+    # Ocultar icono del Dock
+    hide_dock_icon()
     
     print("🎤 WhiteKong Voice - Iniciando aplicación de barra de menú...")
     print("   Usa Ctrl + Option para grabar")
