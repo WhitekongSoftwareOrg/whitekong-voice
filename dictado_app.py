@@ -503,6 +503,120 @@ class WhiteKongVoiceApp(rumps.App):
 
 
 # ══════════════════════════════════════════════════════════════════════════════
+# VERIFICACIÓN DE PERMISOS
+# ══════════════════════════════════════════════════════════════════════════════
+
+def check_accessibility_permission() -> bool:
+    """Verifica si la app tiene permisos de Accesibilidad."""
+    try:
+        from ApplicationServices import AXIsProcessTrusted
+        return AXIsProcessTrusted()
+    except ImportError:
+        # Si no podemos verificar, asumimos que sí
+        return True
+    except Exception:
+        return True
+
+
+def check_microphone_permission() -> bool:
+    """Verifica si la app tiene permisos de micrófono."""
+    try:
+        import AVFoundation
+        status = AVFoundation.AVCaptureDevice.authorizationStatusForMediaType_(
+            AVFoundation.AVMediaTypeAudio
+        )
+        # 0=NotDetermined, 1=Restricted, 2=Denied, 3=Authorized
+        return status == 3
+    except ImportError:
+        return True
+    except Exception:
+        return True
+
+
+def request_microphone_permission():
+    """Solicita permisos de micrófono (muestra diálogo automático de macOS)."""
+    try:
+        import AVFoundation
+        AVFoundation.AVCaptureDevice.requestAccessForMediaType_completionHandler_(
+            AVFoundation.AVMediaTypeAudio,
+            lambda granted: None
+        )
+    except Exception:
+        pass
+
+
+def open_accessibility_preferences():
+    """Abre las Preferencias del Sistema en la sección de Accesibilidad."""
+    import subprocess
+    subprocess.run([
+        "open", 
+        "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
+    ])
+
+
+def open_microphone_preferences():
+    """Abre las Preferencias del Sistema en la sección de Micrófono."""
+    import subprocess
+    subprocess.run([
+        "open",
+        "x-apple.systempreferences:com.apple.preference.security?Privacy_Microphone"
+    ])
+
+
+def show_permission_dialog():
+    """Muestra un diálogo explicando los permisos necesarios."""
+    import subprocess
+    
+    has_accessibility = check_accessibility_permission()
+    has_microphone = check_microphone_permission()
+    
+    if has_accessibility and has_microphone:
+        return True  # Todo OK
+    
+    missing = []
+    if not has_accessibility:
+        missing.append("• Accesibilidad (para detectar Ctrl+Option)")
+    if not has_microphone:
+        missing.append("• Micrófono (para grabar tu voz)")
+    
+    message = f"""WhiteKong Voice necesita los siguientes permisos:
+
+{chr(10).join(missing)}
+
+Se abrirán las Preferencias del Sistema.
+Por favor, añade WhiteKong Voice a la lista y actívalo.
+
+¿Abrir Preferencias del Sistema?"""
+    
+    # Mostrar diálogo con AppleScript
+    script = f'''
+    display dialog "{message}" buttons {{"Cancelar", "Abrir Preferencias"}} default button 2 with title "WhiteKong Voice - Permisos necesarios" with icon caution
+    '''
+    
+    try:
+        result = subprocess.run(
+            ["osascript", "-e", script],
+            capture_output=True,
+            text=True
+        )
+        
+        if "Abrir Preferencias" in result.stdout:
+            if not has_accessibility:
+                open_accessibility_preferences()
+            elif not has_microphone:
+                open_microphone_preferences()
+            return False  # Usuario debe configurar y reiniciar
+        else:
+            return False  # Cancelado
+    except Exception as e:
+        print(f"Error mostrando diálogo: {e}")
+        # Abrir preferencias directamente si falla el diálogo
+        if not has_accessibility:
+            open_accessibility_preferences()
+        return False
+
+
+# ══════════════════════════════════════════════════════════════════════════════
 # PUNTO DE ENTRADA
 # ══════════════════════════════════════════════════════════════════════════════
 
@@ -525,6 +639,20 @@ if __name__ == "__main__":
     print("   Usa Ctrl + Option para grabar")
     print("   Click en el icono 🎤 de la barra de menú para opciones")
     print()
+    
+    # Verificar permisos antes de iniciar
+    # Solicitar micrófono primero (esto muestra diálogo automático de macOS)
+    if not check_microphone_permission():
+        request_microphone_permission()
+    
+    # Verificar accesibilidad
+    if not check_accessibility_permission():
+        print("⚠️  Faltan permisos de Accesibilidad")
+        print("   Abriendo Preferencias del Sistema...")
+        show_permission_dialog()
+        print()
+        print("   Por favor, añade WhiteKong Voice a Accesibilidad y reinicia la app.")
+        # Continuar de todas formas para que el usuario vea el icono
     
     try:
         app = WhiteKongVoiceApp()

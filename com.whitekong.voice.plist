@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Identificador único del servicio -->
+    <key>Label</key>
+    <string>com.whitekong.voice</string>
+    
+    <!-- Ejecutar al iniciar sesión -->
+    <key>RunAtLoad</key>
+    <true/>
+    
+    <!-- Mantener siempre ejecutando (reinicia si se cierra) -->
+    <key>KeepAlive</key>
+    <true/>
+    
+    <!-- Comando a ejecutar -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/smanez/codeWk/wisWK/venv/bin/python</string>
+        <string>/Users/smanez/codeWk/wisWK/dictado_app.py</string>
+    </array>
+    
+    <!-- Directorio de trabajo -->
+    <key>WorkingDirectory</key>
+    <string>/Users/smanez/codeWk/wisWK</string>
+    
+    <!-- Archivos de log para depuración -->
+    <key>StandardOutPath</key>
+    <string>/tmp/whitekong_voice.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/whitekong_voice_error.log</string>
+    
+    <!-- Variables de entorno necesarias -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin:/opt/homebrew/bin</string>
+    </dict>
+    
+    <!-- Dar tiempo al sistema para iniciar completamente -->
+    <key>ThrottleInterval</key>
+    <integer>10</integer>
+</dict>
+</plist>
